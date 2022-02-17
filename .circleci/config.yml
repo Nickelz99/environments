@@ -124,7 +124,6 @@ workflows:
   publish:
     jobs:
       - build-and-publish-docker:
-          name: build-and-publish-docker-prod
           context: determined-production
           filters:
             branches:
@@ -156,16 +155,21 @@ workflows:
 
   publish-dev:
     jobs:
-      - request-publish-dev:
+      - request-publish-dev-docker:
+          type: approval
+          filters: *upstream-feature-branch
+
+      - request-publish-dev-cloud:
           type: approval
           filters: *upstream-feature-branch
 
       - build-and-publish-docker:
           name: build-docker-<<matrix.image-type>>
+          alias: build-docker-all
           context: determined-production
           filters: *upstream-feature-branch
           requires:
-            - request-publish-dev
+            - request-publish-dev-docker
           matrix:
             parameters:
               dev-mode: [true]
@@ -183,3 +187,10 @@ workflows:
                 - pytorch19-tf25-rocm
                 - deepspeed-gpu
                 - gpt-neox-deepspeed-gpu
+
+      - publish-cloud-images:
+          context: determined-production
+          filters: *upstream-feature-branch
+          requires:
+            - build-docker-all
+            - request-publish-dev-cloud
