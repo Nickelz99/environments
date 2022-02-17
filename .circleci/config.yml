@@ -115,8 +115,7 @@ jobs:
     docker:
       - image: cimg/python:3.6
     steps:
-      - run:
-        command: echo hello
+      - run: echo hello
 
 
 workflows:
