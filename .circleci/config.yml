@@ -152,13 +152,13 @@ workflows:
             - build-and-publish-docker
 
   publish-dev:
-    filters:
-      branches:
-        ignore:
-          - /pull\/.*/
-          - /release-.*/
-          - master
     jobs:
       - test-job:
           name: test-job-123
           context: determined-production
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+                - /release-.*/
+                - master
