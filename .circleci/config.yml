@@ -158,12 +158,6 @@ workflows:
     jobs:
       - request-test-job
           type: approval
-          filters:
-            branches:
-              ignore:
-                - /pull\/.*/
-                - /release-.*/
-                - master
 
       - test-job:
           name: test-job-123
