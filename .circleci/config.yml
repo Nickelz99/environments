@@ -111,6 +111,13 @@ jobs:
       - store_artifacts:
           path: /tmp/artifacts
 
+  test-job:
+    docker:
+      - image: cimg/python:3.6
+    steps:
+      - run:
+        command: echo hello
+
 
 workflows:
   publish:
@@ -145,3 +152,12 @@ workflows:
           filters:
             branches:
               only: master
+
+      - request-build-and-publish-docker-dev:
+          type: approval
+          filters: *upstream-feature-branch
+
+      - test-job:
+          context: determined-production
+          requires: request-build-and-publish-docker-dev
+          filters: *upstream-feature-branch
