@@ -156,7 +156,7 @@ workflows:
 
   publish-dev:
     jobs:
-      - request-test-job:
+      - request-publish-dev:
           type: approval
           filters:
             branches:
@@ -165,14 +165,28 @@ workflows:
                 - /release-.*/
                 - master
 
-      - test-job:
-          name: test-job-123
+      - build-and-publish-docker:
+          name: build-and-publish-docker-dev
           context: determined-production
-          requires:
-            - request-test-job
           filters:
             branches:
-              ignore:
-                - /pull\/.*/
-                - /release-.*/
-                - master
+              only: master
+          requires:
+            - request-publish-dev
+          matrix:
+            parameters:
+              dev-mode: true
+              image-type:
+                - tf1-cpu
+                - tf2-cpu
+                - tf25-cpu
+                - tf26-cpu
+                - tf27-cpu
+                - tf1-gpu
+                - tf2-gpu
+                - tf25-gpu
+                - tf26-gpu
+                - tf27-gpu
+                - pytorch19-tf25-rocm
+                - deepspeed-gpu
+                - gpt-neox-deepspeed-gpu
