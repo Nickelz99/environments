@@ -115,6 +115,7 @@ jobs:
     docker:
       - image: cimg/python:3.6
     steps:
+      - checkout
       - run: echo hello
 
 
@@ -158,10 +159,6 @@ workflows:
           - /release-.*/
           - master
     jobs:
-      - request-build-and-publish-docker-dev:
-          type: approval
-
       - test-job:
           name: test-job-123
           context: determined-production
-          requires: request-build-and-publish-docker-dev
