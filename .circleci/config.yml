@@ -122,13 +122,13 @@ jobs:
 workflows:
   version: 2
   publish:
-    filters:
-      branches:
-        only: master
     jobs:
       - build-and-publish-docker:
           name: build-and-publish-docker-prod
           context: determined-production
+          filters:
+            branches:
+              only: master
           matrix:
             parameters:
               image-type:
@@ -148,6 +148,9 @@ workflows:
 
       - publish-cloud-images:
           context: determined-production
+          filters:
+            branches:
+              only: master
           requires:
             - build-and-publish-docker
 
