@@ -4,6 +4,13 @@ version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@1.8.4
 
+upstream-feature-branch: &upstream-feature-branch
+  branches:
+    ignore:
+      - /pull\/.*/
+      - /release-.*/
+      - master
+
 commands:
   login-docker:
     parameters:
@@ -60,6 +67,9 @@ jobs:
     parameters:
       image-type:
         type: string
+      dev-mode:
+        type: boolean
+        default: false
     machine:
       image: ubuntu-1604:201903-01
     resource_class: large
@@ -69,12 +79,21 @@ jobs:
       - login-docker:
           username: ${DOCKER_USER}
           password: ${DOCKER_PASS}
-      - login-docker:
-          repository: nvcr.io
-          username: ${NGC_API_USERNAME}
-          password: ${NGC_API_KEY}
-      - run: make build-<<parameters.image-type>>
-      - run: make publish-<<parameters.image-type>>
+      - unless:
+          condition: <<parameters.dev-mode>>
+          steps:
+            - login-docker:
+                repository: nvcr.io
+                username: ${NGC_API_USERNAME}
+                password: ${NGC_API_KEY}
+            - run: make build-<<parameters.image-type>>
+            - run: make publish-<<parameters.image-type>>
+      - when:
+          condition: <<parameters.dev-mode>>
+          steps:
+            - run: make build-<<parameters.image-type>> REGISTRY_REPO=environments-dev NGC_REGISTRY=
+            - run: make publish-<<parameters.image-type>> REGISTRY_REPO=environments-dev NGC_REGISTRY=
+
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -127,3 +146,31 @@ workflows:
           filters:
             branches:
               only: master
+
+      - request-build-and-publish-docker-dev:
+         type: approval
+         filters: *upstream-feature-branch
+
+      - build-and-publish-docker:
+          name: build-and-publish-docker-dev
+          filters: *upstream-feature-branch
+          requires:
+            - request-build-and-publish-docker-dev
+          context: determined-production
+          matrix:
+            parameters:
+              image-type:
+                - tf1-cpu
+                - tf2-cpu
+                - tf25-cpu
+                - tf26-cpu
+                - tf27-cpu
+                - tf1-gpu
+                - tf2-gpu
+                - tf25-gpu
+                - tf26-gpu
+                - tf27-gpu
+                - pytorch19-tf25-rocm
+                - deepspeed-gpu
+                - gpt-neox-deepspeed-gpu
+              dev-mode: true
