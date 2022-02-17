@@ -156,9 +156,20 @@ workflows:
 
   publish-dev:
     jobs:
+      - request-test-job
+          type: approval
+          filters:
+            branches:
+              ignore:
+                - /pull\/.*/
+                - /release-.*/
+                - master
+
       - test-job:
           name: test-job-123
           context: determined-production
+          requires:
+            - request-test-job
           filters:
             branches:
               ignore:
