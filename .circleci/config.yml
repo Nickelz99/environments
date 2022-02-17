@@ -119,6 +119,7 @@ jobs:
 
 
 workflows:
+  version: 2
   publish:
     jobs:
       - build-and-publish-docker:
@@ -152,11 +153,17 @@ workflows:
             branches:
               only: master
 
+  publish-dev:
+    filters:
+      branches:
+        ignore:
+          - /pull\/.*/
+          - /release-.*/
+          - master
+    jobs:
       - request-build-and-publish-docker-dev:
           type: approval
-          filters: *upstream-feature-branch
 
       - test-job:
           context: determined-production
           requires: request-build-and-publish-docker-dev
-          filters: *upstream-feature-branch
