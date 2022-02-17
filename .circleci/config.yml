@@ -166,7 +166,6 @@ workflows:
                 - master
 
       - build-and-publish-docker:
-          name: build-and-publish-docker-dev
           context: determined-production
           filters:
             branches:
