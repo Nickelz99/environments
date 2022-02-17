@@ -161,7 +161,7 @@ workflows:
           filters: *upstream-feature-branch
 
       - build-and-publish-docker:
-          name: build-docker
+          name: build-docker-<<matrix.image-type>>
           context: determined-production
           filters: *upstream-feature-branch
           requires:
