@@ -121,6 +121,9 @@ jobs:
 workflows:
   version: 2
   publish:
+    filters:
+      branches:
+        only: master
     jobs:
       - build-and-publish-docker:
           name: build-and-publish-docker-prod
@@ -141,17 +144,11 @@ workflows:
                 - pytorch19-tf25-rocm
                 - deepspeed-gpu
                 - gpt-neox-deepspeed-gpu
-          filters:
-            branches:
-              only: master
 
       - publish-cloud-images:
           context: determined-production
           requires:
             - build-and-publish-docker
-          filters:
-            branches:
-              only: master
 
   publish-dev:
     filters:
@@ -165,5 +162,6 @@ workflows:
           type: approval
 
       - test-job:
+          name: test-job-123
           context: determined-production
           requires: request-build-and-publish-docker-dev
