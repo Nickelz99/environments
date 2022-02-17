@@ -165,12 +165,12 @@ workflows:
 
       - build-and-publish-docker:
           name: build-docker-<<matrix.image-type>>
-          alias: build-docker-all
           context: determined-production
           filters: *upstream-feature-branch
           requires:
             - request-publish-dev-docker
           matrix:
+            alias: build-docker-all
             parameters:
               dev-mode: [true]
               image-type:
