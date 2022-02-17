@@ -91,9 +91,8 @@ jobs:
       - when:
           condition: <<parameters.dev-mode>>
           steps:
-            - run: make build-<<parameters.image-type>> REGISTRY_REPO=environments-dev NGC_REGISTRY=
-            - run: make publish-<<parameters.image-type>> REGISTRY_REPO=environments-dev NGC_REGISTRY=
-
+            - run: make build-<<parameters.image-type>> NGC_REGISTRY= REGISTRY_REPO=environments-dev
+            - run: make publish-<<parameters.image-type>> NGC_REGISTRY= REGISTRY_REPO=environments-dev
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -118,6 +117,7 @@ workflows:
   publish:
     jobs:
       - build-and-publish-docker:
+          name: build-and-publish-docker-prod
           context: determined-production
           matrix:
             parameters:
