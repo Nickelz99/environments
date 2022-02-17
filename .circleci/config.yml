@@ -97,6 +97,10 @@ jobs:
           path: /tmp/artifacts
 
   publish-cloud-images:
+    parameters:
+      dev-mode:
+        type: boolean
+        default: false
     docker:
       - image: cimg/python:3.6
     steps:
@@ -105,9 +109,18 @@ jobs:
       - gcp-cli/install
       - activate-service-account
       - install-ansible
-      - run:
-          no_output_timeout: 90m
-          command: make publish-cloud-images PACKER_FLAGS="-force"
+      - unless:
+          condition: <<parameters.dev-mode>>
+          steps:
+            - run:
+                no_output_timeout: 90m
+                command: make publish-cloud-images PACKER_FLAGS="-force"
+      - when:
+          condition: <<parameters.dev-mode>>
+          steps:
+            - run:
+                no_output_timeout: 90m
+                command: make publish-cloud-images PACKER_FLAGS="-force" NGC_PUBLISH= REGISTRY_REPO=environments-dev
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -194,3 +207,4 @@ workflows:
           requires:
             - build-docker-all
             - request-publish-dev-cloud
+          dev-mode: true
