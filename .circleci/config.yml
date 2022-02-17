@@ -177,7 +177,7 @@ workflows:
           filters: *upstream-feature-branch
 
       - build-and-publish-docker:
-          name: build-and-publish-docker-<<matrix.image-type>>
+          name: build-and-publish-docker-<<matrix.image-type>>-dev
           context: determined-production
           filters: *upstream-feature-branch
           requires:
@@ -202,7 +202,7 @@ workflows:
                 - gpt-neox-deepspeed-gpu
 
       - publish-cloud-images:
-          name: publish-cloud-images
+          name: publish-cloud-images-dev
           context: determined-production
           filters: *upstream-feature-branch
           requires:
